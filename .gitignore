@@ -6,6 +6,7 @@ README_REF.md
 .idea/
 .botenv
 
+
 # VSCode
 .vscode
 
@@ -111,6 +112,7 @@ celerybeat-schedule
 .botenv
 .venv
 env/
+botenv/
 venv/
 ENV/
 env.bak/
