@@ -6,5 +6,5 @@ Technology stack:
 
 #Progress
 ---------
-|###-----------------------------|
+|#########-----------------------|
 (The most important thing is to start :) )
