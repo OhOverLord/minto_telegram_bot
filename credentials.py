@@ -1,2 +1,10 @@
-bot_token = "5558049580:AAHsVnPU8JGsUUzRbtBo3HQRxO3tEMxh174"
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
 bot_user_name = "minto_telegram_bot"

@@ -7,17 +7,16 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
-from credentials import bot_token
+from credentials import SECRET_KEY
 from config import BUTTONS, INFO
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
+
 logger = logging.getLogger(__name__)
 
-updater = Updater(bot_token,
-				use_context=True)
-
+updater = Updater(SECRET_KEY, use_context=True)
 
 def start(update: Update, context: CallbackContext):
 	update.message.reply_text(
