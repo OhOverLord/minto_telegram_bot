@@ -1,6 +1,6 @@
 from cgitb import text
 import logging
-from telegram import KeyboardButton, ReplyKeyboardMarkup
+from telegram import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
 from telegram.update import Update
 from telegram.ext.callbackcontext import CallbackContext
@@ -17,29 +17,58 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 updater = Updater(SECRET_KEY, use_context=True)
+competition = False
+code = False
 
-def start(update: Update, context: CallbackContext):
+def valid_wallet_data(data):
+	if 'lol' in data:
+		return True
+	else:
+		return False
+
+def valid_code_data(data):
+	if 'lol' in data:
+		return True
+	else:
+		return False
+
+async def start(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Hello sir, Welcome to the mitno bot. Please write\
 		/help to see the commands available.")
 	buttons = [[KeyboardButton(BUTTONS["competition"])], [KeyboardButton(BUTTONS["code"])]]
-	context.bot.send_message(chat_id=update.effective_chat.id, text="Hello", reply_markup=ReplyKeyboardMarkup(buttons))
+	await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi :)", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
 
-def message_handler(update: Update, context: CallbackContext):
+async def message_handler(update: Update, context: CallbackContext):
+	global competition, code
 	if BUTTONS["competition"] in update.message.text:
-		update.message.reply_text(INFO["competition_info"])
-	if BUTTONS["code"] in update.message.text:
-		update.message.reply_text(INFO["code_info"])
+		competition=True
+		await update.message.reply_text(INFO["competition_info"])
+	elif BUTTONS["code"] in update.message.text:
+		code = True
+		await update.message.reply_text(INFO["code_info"])
+	elif competition:
+		user_message = update.message.text
+		if(valid_wallet_data(user_message)):
+			competition = False
+			buttons = [[InlineKeyboardButton(text="support")]]
+			await update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+		else:
+			await update.message.reply_text("Data isn't valid, send in one more time")
+	elif code:
+		user_message = update.message.text
+		if(valid_code_data(user_message)):
+			competition = False
+			await update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}")
+		else:
+			await update.message.reply_text("Code isn't valid, send in one more time")
+	elif 'thanks' in update.message.text:
+		await update.message.reply_text("You're welcome")
+	else:
+		await update.message.reply_text("I don't anderstand what are you doing")
 
-def help(update: Update, context: CallbackContext):
-	update.message.reply_text("Egor is very cool men (it isn't joke)")
-
-def unknown_text(update: Update, context: CallbackContext):
-	update.message.reply_text(f"Sorry I can't recognize you , you said {update.message.text}")
-
-def unknown(update: Update, context: CallbackContext):
-    update.message.reply_text(f"Sorry {update.message.text} is not a valid command")
-
+async def help(update: Update, context: CallbackContext):
+	await update.message.reply_text("Egor is very cool men (it isn't joke)")
 
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('help', help))
