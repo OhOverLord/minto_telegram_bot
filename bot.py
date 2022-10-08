@@ -32,43 +32,43 @@ def valid_code_data(data):
 	else:
 		return False
 
-async def start(update: Update, context: CallbackContext):
+def start(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Hello sir, Welcome to the mitno bot. Please write\
 		/help to see the commands available.")
 	buttons = [[KeyboardButton(BUTTONS["competition"])], [KeyboardButton(BUTTONS["code"])]]
-	await context.bot.send_message(chat_id=update.effective_chat.id, text="Hi :)", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
+	context.bot.send_message(chat_id=update.effective_chat.id, text="Hi :)", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
 
-async def message_handler(update: Update, context: CallbackContext):
+def message_handler(update: Update, context: CallbackContext):
 	global competition, code
 	if BUTTONS["competition"] in update.message.text:
 		competition=True
-		await update.message.reply_text(INFO["competition_info"])
+		update.message.reply_text(INFO["competition_info"])
 	elif BUTTONS["code"] in update.message.text:
 		code = True
-		await update.message.reply_text(INFO["code_info"])
+		update.message.reply_text(INFO["code_info"])
 	elif competition:
 		user_message = update.message.text
 		if(valid_wallet_data(user_message)):
 			competition = False
 			buttons = [[InlineKeyboardButton(text="support")]]
-			await update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+			update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
 		else:
-			await update.message.reply_text("Data isn't valid, send in one more time")
+			update.message.reply_text("Data isn't valid, send in one more time")
 	elif code:
 		user_message = update.message.text
 		if(valid_code_data(user_message)):
 			competition = False
-			await update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}")
+			update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}")
 		else:
-			await update.message.reply_text("Code isn't valid, send in one more time")
+			update.message.reply_text("Code isn't valid, send in one more time")
 	elif 'thanks' in update.message.text:
-		await update.message.reply_text("You're welcome")
+		update.message.reply_text("You're welcome")
 	else:
-		await update.message.reply_text("I don't anderstand what are you doing")
+		update.message.reply_text("I don't anderstand what are you doing")
 
-async def help(update: Update, context: CallbackContext):
-	await update.message.reply_text("Egor is very cool men (it isn't joke)")
+def help(update: Update, context: CallbackContext):
+	update.message.reply_text("Egor is very cool men (it isn't joke)")
 
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('help', help))
