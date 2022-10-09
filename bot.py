@@ -1,4 +1,3 @@
-from cgitb import text
 import logging
 from telegram import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext.updater import Updater
@@ -10,6 +9,7 @@ from telegram.ext.callbackqueryhandler import CallbackQueryHandler
 from telegram.ext.filters import Filters
 from credentials import SECRET_KEY
 from config import BUTTONS, INFO
+import validators
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -21,8 +21,18 @@ updater = Updater(SECRET_KEY, use_context=True)
 competition = False
 code = False
 
-def valid_wallet_data(data):
-	if 'lol' in data:
+def valid_link(link):
+	return validators.url(link)
+
+def valid_wallet(wallet):
+	return True if len(wallet) == 42 else False
+
+def valid_nickname(nickname):
+	return True if "@" in nickname else False
+
+def valid_tokens_data(data):
+	filtered_data = data.split(" ")
+	if valid_link(filtered_data[0]) and valid_nickname(filtered_data[1]) and valid_wallet(filtered_data[2]):
 		return True
 	else:
 		return False
@@ -39,56 +49,59 @@ def start(update: Update, context: CallbackContext):
 
 def minto_tokens_answ(update: Update, context: CallbackContext):
 	buttons = [
-        [InlineKeyboardButton(BUTTONS["competition"], callback_data="1"),],
-        [InlineKeyboardButton(BUTTONS["code"], callback_data="3")],
+        [InlineKeyboardButton(BUTTONS["competition"], callback_data=BUTTONS["competition"]),],
+        [InlineKeyboardButton(BUTTONS["code"], callback_data=BUTTONS["code"])],
     ]
-	context.bot.send_message(chat_id=update.effective_chat.id, text="!!!", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+	context.bot.send_message(chat_id=update.effective_chat.id, text=INFO["token_text"], reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+
+def support_message(update: Update, context: CallbackContext, user_data):
+	buttons = [[InlineKeyboardButton(text="Tokens sended", callback_data="Tokens sended")], [InlineKeyboardButton(text="There's a mistake in user data", callback_data="There's a mistake in user data")]]
+	context.bot.send_message(chat_id=398322598, text=user_data, reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
 
 def message_handler(update: Update, context: CallbackContext):
 	global competition, code
 	if BUTTONS["minto_about"] in update.message.text:
 		update.message.reply_text("It will be in the near future! I promise")
 	elif BUTTONS["free_tokens"] in update.message.text:
-		context.bot.send_message(chat_id=update.effective_chat.id, text="/free_tokens")
-	elif BUTTONS["competition"] in update.message.text:
-		competition=True
-		update.message.reply_text(INFO["competition_info"])
-	elif BUTTONS["code"] in update.message.text:
-		code = True
-		update.message.reply_text(INFO["code_info"])
-	elif competition:
+		minto_tokens_answ(update, context)
+	elif competition == True:
 		user_message = update.message.text
-		if(valid_wallet_data(user_message)):
+		if(valid_tokens_data(user_message)):
 			competition = False
-			buttons = [[InlineKeyboardButton(text="support")]]
-			update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+			buttons = [[InlineKeyboardButton(text="support", callback_data=BUTTONS["support"])]]
+			update.message.reply_text(INFO["info_answ"], reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
+			support_message(update, context, user_message)
 		else:
-			update.message.reply_text("Data isn't valid, send in one more time")
+			update.message.reply_text(INFO["not_valid_data"])
 	elif code:
 		user_message = update.message.text
 		if(valid_code_data(user_message)):
-			competition = False
-			update.message.reply_text(f"Thanks! Give me up to one hour to check the data. {user_message}")
+			code = False
+			update.message.reply_text(INFO["info_answ"])
 		else:
-			update.message.reply_text("Code isn't valid, send in one more time")
+			update.message.reply_text(INFO["not_valid_data"])
 	elif 'thanks' in update.message.text:
 		update.message.reply_text("You're welcome")
-	else:
-		update.message.reply_text("I don't anderstand what are you doing")
+	else: update.message.reply_text("I don't anderstand what are you doing")
 
 def help(update: Update, context: CallbackContext):
-	update.message.reply_text("Egor is very cool men (it isn't joke)")
+	update.message.reply_text("The list of commands:")
 
-def button(update: Update, context: CallbackContext) -> None:
+def token_buttons(update: Update, context: CallbackContext):
     query = update.callback_query
     query.answer()
-
-    query.edit_message_text(text=f"Selected option: {query.data}")
+    global competition, code
+    if BUTTONS["competition"] in query.data:
+        competition=True
+        query.edit_message_text(INFO["competition_info"])
+    elif BUTTONS["code"] in query.data:
+        code = True
+        query.edit_message_text(INFO["code_info"])
 
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('free_tokens', minto_tokens_answ))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, message_handler))
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
+updater.dispatcher.add_handler(CallbackQueryHandler(token_buttons))
 
 updater.start_polling()

@@ -5,6 +5,7 @@ BUTTONS = {
     "not_valid_data": "There is something wrong with the data",
     "minto_about": "📚Minto about📚",
     "free_tokens": "🤑Get free tokens🤑",
+    "support": "support",
 }
 
 INFO = {
@@ -15,6 +16,8 @@ Please send us following data:
 — a link to the competition you participated in
 —  your nickname from the social media where you won
 — your wallet number on BSC chain
+Example message:
+https://t.me/btcmtofficial/527 @example 0xD984b7b3A92753f74c9e2025de7902a5ABb74df4
     """,
     "code_info": """
 Cool that you decided to try mining with Minto! We need quite a bit of data to send you tokens.
@@ -33,4 +36,6 @@ In the booklet, on the card under the erasable layer, you should have a code. Pl
         Do you have any questions?
     """,
     "welcome_text": "Hello sir, Welcome to the mitno bot. Please write /help to see the commands available.",
+    "token_text": "Wow! You can take your tokens! Choose the button!",
+    "not_valid_data": "Data isn't valid, send in one more time",
 }
