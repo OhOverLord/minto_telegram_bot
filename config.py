@@ -3,6 +3,8 @@ BUTTONS = {
     "code": "I have a code from Minto card",
     "valid_data": "The data is correct",
     "not_valid_data": "There is something wrong with the data",
+    "minto_about": "📚Minto about📚",
+    "free_tokens": "🤑Get free tokens🤑",
 }
 
 INFO = {
@@ -30,4 +32,5 @@ In the booklet, on the card under the erasable layer, you should have a code. Pl
         telegram | discord |  twitter
         Do you have any questions?
     """,
+    "welcome_text": "Hello sir, Welcome to the mitno bot. Please write /help to see the commands available.",
 }

@@ -6,6 +6,7 @@ from telegram.update import Update
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
+from telegram.ext.callbackqueryhandler import CallbackQueryHandler
 from telegram.ext.filters import Filters
 from credentials import SECRET_KEY
 from config import BUTTONS, INFO
@@ -33,15 +34,23 @@ def valid_code_data(data):
 		return False
 
 def start(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"Hello sir, Welcome to the mitno bot. Please write\
-		/help to see the commands available.")
-	buttons = [[KeyboardButton(BUTTONS["competition"])], [KeyboardButton(BUTTONS["code"])]]
-	context.bot.send_message(chat_id=update.effective_chat.id, text="Hi :)", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
+	buttons = [[KeyboardButton(BUTTONS["minto_about"])], [KeyboardButton(BUTTONS["free_tokens"])]]
+	context.bot.send_message(chat_id=update.effective_chat.id, text=INFO["welcome_text"], reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
+
+def minto_tokens_answ(update: Update, context: CallbackContext):
+	buttons = [
+        [InlineKeyboardButton(BUTTONS["competition"], callback_data="1"),],
+        [InlineKeyboardButton(BUTTONS["code"], callback_data="3")],
+    ]
+	context.bot.send_message(chat_id=update.effective_chat.id, text="!!!", reply_markup=InlineKeyboardMarkup(buttons, resize_keyboard=True))
 
 def message_handler(update: Update, context: CallbackContext):
 	global competition, code
-	if BUTTONS["competition"] in update.message.text:
+	if BUTTONS["minto_about"] in update.message.text:
+		update.message.reply_text("It will be in the near future! I promise")
+	elif BUTTONS["free_tokens"] in update.message.text:
+		context.bot.send_message(chat_id=update.effective_chat.id, text="/free_tokens")
+	elif BUTTONS["competition"] in update.message.text:
 		competition=True
 		update.message.reply_text(INFO["competition_info"])
 	elif BUTTONS["code"] in update.message.text:
@@ -70,8 +79,16 @@ def message_handler(update: Update, context: CallbackContext):
 def help(update: Update, context: CallbackContext):
 	update.message.reply_text("Egor is very cool men (it isn't joke)")
 
+def button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    query.answer()
+
+    query.edit_message_text(text=f"Selected option: {query.data}")
+
 updater.dispatcher.add_handler(CommandHandler('start', start))
 updater.dispatcher.add_handler(CommandHandler('help', help))
+updater.dispatcher.add_handler(CommandHandler('free_tokens', minto_tokens_answ))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, message_handler))
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 updater.start_polling()
