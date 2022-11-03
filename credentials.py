@@ -1,3 +1,5 @@
+#Тут секретный ключ берётся из виртуального окружения
+
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv

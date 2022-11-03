@@ -1,3 +1,5 @@
+#Я вынес сюда все тексты кнопок, так как не знал в каком виде они будут храниться на сервере, можно читать их из файла, но на хероку это не сработает
+
 BUTTONS = {
     "competition": "I have won the Minto competition",
     "code": "I have a code from Minto card",
