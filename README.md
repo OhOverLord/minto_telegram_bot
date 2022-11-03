@@ -2,7 +2,8 @@
 ------------------------------------------
 Technology stack:
 - python3
-- flask (maybe in future)
+- Heroku
+- python telegram library
 
 #Progress
 ---------
